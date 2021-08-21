@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load colorize %}
+
+{% block head %} 
+
+<style type="text/css">
+* {
+	font-family: 'Lato', sans-serif;
+}
+
+a {
+	text-decoration: none;
+	color: black;
+}
+
+.title {
+	font-size: 20px;
+	text-transform: uppercase;
+}
+
+.price {
+	font-size: 25px;
+}
+
+.card, .btn {
+	border-radius: 0px;
+}
+
+.info {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Add an item for tracking</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form action="" method="POST" autocomplete="off">
+					{% csrf_token %}
+					{{form|crispy}}
+					<button type="submit" class="btn btn-success mt-2"><i class="fas fa-database"></i> Save</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	
+	<div class="col-md-9">
+
+		{% if qs %}
+
+		{% for item in qs %}
+		<div class="card mt-3">
+			<div class="card-header">
+				<div class="row">
+					<div class="col-md-11" style="border-right: 1px solid lightblue;">
+						<a target="_blank" href="{{item.url}}">{{item.name}}</a>
+					</div>
+					<div class="col-md-1">
+						<form action="{% url 'delete' item.id %}" method="POST" class="d-inline">
+							{% csrf_token %}
+							<button type="submit" class="btn">
+								<i class="far fa-trash-alt fa-lg text-danger"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					
+					<div class="col-md-4">
+						<div class="title text-center">current price</div> 
+						<div class="price text-center">&#8377; {{item.current_price}}</div>
+					</div>
+					<div class="col-md-4">
+						<div class="title text-center">old price</div> 
+						<div class="price text-center">&#8377; {{item.old_price}}</div>
+					</div>
+					<div class="col-md-4">
+						<div class="title text-center">difference</div>
+						<div class="price text-center">&#8377; {{item.price_difference | colorize}}</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+
+		{% else %}
+		<h3> No items being tracked ... </h3>
+		{% endif %}
+
+	</div>
+
+	<div class="col-md-3">
+		
+		<div class="card mt-3">
+			<div class="card-body">
+				<div class="d-grid gap-2">
+					<button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addItemModal"><i class="fas fa-plus-circle"></i> ADD PRODUCT</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="card mt-3">
+			<div class="card-body">
+				<h4 class="text-center">Total items:</h4> 
+				<h2 class="text-center" style="color: midnightblue;">{{items_no}}</h2>
+			</div>
+		</div>
+
+		<div class="card mt-3">
+			<div class="card-body">
+				<h4 class="text-center">Discounted items:</h4> 
+				<h2 class="text-center" style="color: green;">{{no_discounted}}</h2>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
